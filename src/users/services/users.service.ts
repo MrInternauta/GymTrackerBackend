@@ -5,9 +5,9 @@ import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 
 import { Role } from '../../core/auth/models/roles.model';
-import { CreateCustomerDto } from '../dtos/customer.dto';
+import { CreateCustomerDto, UpdateCustomerDto } from '../dtos/customer.dto';
 // import { Client } from 'pg';
-import { CreateUserDto } from '../dtos/user.dto';
+import { CreateUserDto, UpdateUserDto } from '../dtos/user.dto';
 // import { ConfigService } from '@nestjs/config';
 import { User } from '../entities/user.entity';
 import { CustomersService } from './customers.service';
@@ -50,16 +50,11 @@ export class UsersService {
     const user = this.userRepo.create({ ...entity, role: Role.ADMIN });
     const HASHED_PASS = await bcrypt.hash(user.password, 10);
     user.password = HASHED_PASS;
-
-    if (entity.customerId) {
-      const customer = await this.customerService.findOne(entity.customerId);
-      user.customer = customer;
-    }
     this.userRepo.save(user);
     return user;
   }
 
-  async createClient(entity: CreateUserDto & CreateCustomerDto) {
+  async createClient(entity: CreateCustomerDto) {
     try {
       const userFound = await this.findByEmail(entity.email);
       if (userFound) throw new BadRequestException('Email in use');
@@ -70,7 +65,7 @@ export class UsersService {
         phone: '',
       };
       const newCustomer = await this.customerService.create(customer);
-      const user = this.userRepo.create(entity);
+      const user = this.userRepo.create({ ...entity, role: Role.CUSTOMER });
       const HASHED_PASS = await bcrypt.hash(user.password, 10);
       user.password = HASHED_PASS;
       if (newCustomer) {
@@ -79,11 +74,14 @@ export class UsersService {
       const newUser = await this.userRepo.save(user);
       return newUser;
     } catch (error) {
-      throw new InternalServerErrorException('');
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(error);
     }
   }
 
-  async update(id: number, payload: any) {
+  async update(id: number, payload: UpdateUserDto) {
     const user = await this.findOne(id);
     if (!user) {
       throw new NotFoundException('User Not found');
@@ -92,10 +90,22 @@ export class UsersService {
     return this.userRepo.save(user);
   }
 
+  async updateCustomer(id: number, payload: UpdateCustomerDto) {
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new NotFoundException('User Not found');
+    }
+    await this.customerService.update(user?.customer?.id, payload);
+    return user;
+  }
+
   async delete(id: number) {
     const user = await this.findOne(id);
     if (!user) {
       throw new NotFoundException('User Not found');
+    }
+    if (user?.customer?.id) {
+      await this.customerService.delete(user?.customer?.id);
     }
     return this.userRepo.softDelete({ id });
   }

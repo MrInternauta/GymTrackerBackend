@@ -8,14 +8,12 @@ import { config } from './config';
 import { AuthModule } from './core/auth/auth.module';
 import enviroments from './core/config/enviroments';
 import { DatabaseModule } from './core/database/database.module';
-import { AppController } from './home/app.controller';
-import { AppService } from './home/app.service';
 import { OrdersModule } from './orders/orders.module';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
-  controllers: [AppController],
+  controllers: [],
   imports: [
     AuthModule,
     ConfigModule.forRoot({
@@ -40,7 +38,6 @@ import { UsersModule } from './users/users.module';
     OrdersModule,
   ],
   providers: [
-    AppService,
     // {
     //   //npm i --save @nestjs/axios
     //   provide: 'MyAsync',
@@ -48,7 +45,6 @@ import { UsersModule } from './users/users.module';
     //     const myTask = await http
     //       .get('https://jsonplaceholder.typicode.com/todos')
     //       .toPromise();
-
     //     return myTask.data;
     //   },
     //   inject: [HttpService], //INJECT DEPENDENCY TO THE PROVIDER

@@ -5,7 +5,6 @@ import { OrdersModule } from 'src/orders/orders.module';
 
 import { OrdersController } from '../orders/controllers/orders.controller';
 import { ProductsModule } from '../products/products.module';
-import { CustomerController } from './controllers/customers.controller';
 import { ProfileController } from './controllers/profile.controller';
 import { UsersController } from './controllers/users.controller';
 import { Customer } from './entities/customer.entity';
@@ -17,6 +16,6 @@ import { UsersService } from './services/users.service';
   imports: [forwardRef(() => OrdersModule), ProductsModule, TypeOrmModule.forFeature([User, Customer])],
   exports: [UsersService, CustomersService],
   providers: [UsersService, CustomersService],
-  controllers: [UsersController, OrdersController, CustomerController, ProfileController],
+  controllers: [UsersController, OrdersController, ProfileController],
 })
 export class UsersModule {}
