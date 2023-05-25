@@ -8,9 +8,8 @@ import { config } from './config';
 import { AuthModule } from './core/auth/auth.module';
 import enviroments from './core/config/enviroments';
 import { DatabaseModule } from './core/database/database.module';
-import { OrdersModule } from './orders/orders.module';
-import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
+import { WorkoutModule } from './workout/workout.module';
 
 @Module({
   controllers: [],
@@ -32,10 +31,9 @@ import { UsersModule } from './users/users.module';
       }),
     }),
     DatabaseModule,
-    ProductsModule,
     UsersModule,
     HttpModule,
-    OrdersModule,
+    WorkoutModule,
   ],
   providers: [
     // {

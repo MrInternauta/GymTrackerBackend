@@ -6,7 +6,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api', { exclude: []});
+  app.setGlobalPrefix('api', { exclude: [] });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, //Remove not declared fields
@@ -14,16 +14,15 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    }),
+    })
   ); //Activate pipe validator
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   const config = new DocumentBuilder()
-    .setTitle('My example')
-    .setDescription('The store API description')
+    .setTitle('My GymTracker')
+    .setDescription('The API description')
     .setVersion('1.0')
-    //.addTag('cats')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);

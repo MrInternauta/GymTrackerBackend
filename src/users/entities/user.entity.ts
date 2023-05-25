@@ -1,8 +1,9 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Role } from '../../core/auth/models/roles.model';
 import { BasicEntity } from '../../core/interfaces/basic.entity';
+import { IRoutine } from '../../workout/entities/IRoutine.entity';
 import { Customer } from './customer.entity';
 
 @Entity()
@@ -26,4 +27,10 @@ export class User extends BasicEntity {
     name: 'customer_id',
   }) //naming relation 1 to 1
   customer: Customer;
+
+  @ManyToMany(() => IRoutine, routine => routine.users, {
+    nullable: true,
+    eager: true,
+  })
+  public routines: Array<IRoutine>;
 }

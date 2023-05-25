@@ -6,17 +6,17 @@ import * as bcrypt from 'bcrypt';
 
 import { User } from '../../../users/entities/user.entity';
 import { UsersService } from '../../../users/services/users.service';
-import { PayloadToken } from '../models/token.model';
+import { AuthSuccess } from '../../interfaces/Responses/Login';
 
 @Injectable()
 export class AuthService {
   constructor(private userService: UsersService, private jwtService: JwtService) {}
 
   async validateUser(userName: string, password: string) {
-    const user = await this.userService.findByEmail(userName);
+    const user = await this.userService.findByEmailWithCustomer(userName);
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new ForbiddenException('User or password wrong!');
+      throw new ForbiddenException('The email address or password is wrong!');
     }
     return user;
   }
@@ -25,8 +25,10 @@ export class AuthService {
     return this.jwtService.verify(token);
   }
 
-  generateToken(user: User): string {
-    const payload: PayloadToken = { role: user.role, sub: user.id };
-    return this.jwtService.sign(payload);
+  generateToken(user: User): AuthSuccess {
+    return {
+      access_token: this.jwtService.sign({ ...user, password: null }),
+      user,
+    };
   }
 }

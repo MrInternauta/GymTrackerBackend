@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import * as bcrypt from 'bcrypt';
@@ -16,12 +16,14 @@ import { CustomersService } from './customers.service';
 export class UsersService {
   constructor(private customerService: CustomersService, @InjectRepository(User) private userRepo: Repository<User>) {}
 
-  findAll(page: number, limit: number) {
-    const end = page * limit;
-    const start = end - limit;
-    return this.userRepo.find({
-      relations: ['customer'],
-    });
+  findAll(skip: number, take: number) {
+    if (skip >= 0 && take) {
+      return this.userRepo.find({
+        take,
+        skip,
+      });
+    }
+    return this.userRepo.find();
   }
 
   findbyCustomerId(id: number) {
@@ -32,8 +34,13 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    return this.userRepo.findOneBy({
-      id,
+    return this.userRepo.findOneBy({ id });
+  }
+
+  async findOneWithCustomer(id: number) {
+    return this.userRepo.findOne({
+      where: { id },
+      relations: ['customer'],
     });
   }
 
@@ -43,28 +50,37 @@ export class UsersService {
     });
   }
 
-  async create(entity: CreateUserDto) {
-    const userFound = await this.findByEmail(entity.email);
-    if (userFound) throw new BadRequestException('Email in use');
+  async findByEmailWithCustomer(email: string): Promise<User> {
+    return this.userRepo.findOne({
+      where: { email },
+      relations: ['customer'],
+    });
+  }
 
-    const user = this.userRepo.create({ ...entity, role: Role.ADMIN });
-    const HASHED_PASS = await bcrypt.hash(user.password, 10);
-    user.password = HASHED_PASS;
-    this.userRepo.save(user);
-    return user;
+  async create(entity: CreateUserDto) {
+    try {
+      const userFound = await this.findByEmail(entity.email);
+      if (userFound) throw new BadRequestException('The email address is already in use');
+
+      const user = this.userRepo.create({ ...entity, role: Role.ADMIN });
+      const HASHED_PASS = await bcrypt.hash(user.password, 10);
+      user.password = HASHED_PASS;
+      this.userRepo.save(user);
+      return user;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException(error);
+    }
   }
 
   async createClient(entity: CreateCustomerDto) {
     try {
       const userFound = await this.findByEmail(entity.email);
-      if (userFound) throw new BadRequestException('Email in use');
+      if (userFound) throw new BadRequestException('The email address is already in use');
 
-      const customer: CreateCustomerDto = {
-        name: entity.name,
-        lastName: '',
-        phone: '',
-      };
-      const newCustomer = await this.customerService.create(customer);
+      const newCustomer = await this.customerService.create(entity);
       const user = this.userRepo.create({ ...entity, role: Role.CUSTOMER });
       const HASHED_PASS = await bcrypt.hash(user.password, 10);
       user.password = HASHED_PASS;
@@ -77,36 +93,57 @@ export class UsersService {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      throw new InternalServerErrorException(error);
+      throw new BadRequestException(error);
     }
   }
 
   async update(id: number, payload: UpdateUserDto) {
-    const user = await this.findOne(id);
-    if (!user) {
-      throw new NotFoundException('User Not found');
+    try {
+      const user = await this.findOne(id);
+      if (!user) {
+        throw new NotFoundException('User was not found');
+      }
+      this.userRepo.merge(user, payload);
+      return this.userRepo.save(user);
+    } catch (error) {
+      if (error instanceof BadRequestException || error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException(error);
     }
-    this.userRepo.merge(user, payload);
-    return this.userRepo.save(user);
   }
 
   async updateCustomer(id: number, payload: UpdateCustomerDto) {
-    const user = await this.findOne(id);
-    if (!user) {
-      throw new NotFoundException('User Not found');
+    try {
+      const user = await this.findOne(id);
+      if (!user) {
+        throw new NotFoundException('User was not found');
+      }
+      await this.customerService.update(user?.customer?.id, payload);
+      return user;
+    } catch (error) {
+      if (error instanceof BadRequestException || error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException(error);
     }
-    await this.customerService.update(user?.customer?.id, payload);
-    return user;
   }
 
   async delete(id: number) {
-    const user = await this.findOne(id);
-    if (!user) {
-      throw new NotFoundException('User Not found');
+    try {
+      const user = await this.findOne(id);
+      if (!user) {
+        throw new NotFoundException('User was not found');
+      }
+      if (user?.customer?.id) {
+        await this.customerService.delete(user?.customer?.id);
+      }
+      return this.userRepo.softDelete({ id });
+    } catch (error) {
+      if (error instanceof BadRequestException || error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException(error);
     }
-    if (user?.customer?.id) {
-      await this.customerService.delete(user?.customer?.id);
-    }
-    return this.userRepo.softDelete({ id });
   }
 }

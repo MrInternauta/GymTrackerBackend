@@ -7,7 +7,7 @@ import { Request } from 'express';
 
 import { User } from '../../../users/entities/user.entity';
 import { GenericResponse } from '../../interfaces/Responses/Generic';
-import { LoginResponse } from '../../interfaces/Responses/Login';
+import { AuthSuccess } from '../../interfaces/Responses/Login';
 import { LOCAL_STRATEGY } from '../constants/auth';
 import { Role } from '../models/roles.model';
 import { AuthService } from '../services/auth.service';
@@ -36,13 +36,7 @@ export class AuthController {
       },
     ],
   })
-  login(@Req() request: Request): GenericResponse<LoginResponse> {
-    const user = request.user as User;
-    return {
-      data: {
-        access_token: this.authService.generateToken(user),
-        user,
-      },
-    };
+  login(@Req() { user }: Request): GenericResponse<AuthSuccess> {
+    return { data: this.authService.generateToken(user as User) };
   }
 }

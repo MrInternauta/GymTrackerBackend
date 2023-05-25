@@ -1,7 +1,6 @@
-import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { BasicEntity } from '../../core/interfaces/basic.entity';
-import { Order } from '../../orders/entities/order.entity';
 import { User } from './user.entity';
 
 @Entity()
@@ -20,7 +19,4 @@ export class Customer extends BasicEntity {
 
   @OneToOne(() => User, user => user.customer, { nullable: true }) //Bidirectional relation (ref)
   user: User;
-
-  @OneToMany(() => Order, order => order.customer, { nullable: true })
-  orders: Order[];
 }

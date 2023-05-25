@@ -22,6 +22,7 @@ import { RoleD } from '../../core/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../core/auth/guards/roles.guard';
 import { Role } from '../../core/auth/models/roles.model';
+import { FilterDto } from '../../core/interfaces/filter.dto';
 import { CreateCustomerDto, UpdateCustomerDto } from '../dtos/customer.dto';
 import { CreateUserDto, UpdateUserDto } from '../dtos/user.dto';
 import { User } from '../entities/user.entity';
@@ -54,8 +55,8 @@ export class UsersController {
       },
     ],
   })
-  async findAll(@Query('page') page = 1, @Query('limit') limit = 10): Promise<GenericResponse<User[]>> {
-    const data = await this.usersService.findAll(page, limit);
+  async findAll(@Query() params: FilterDto): Promise<GenericResponse<User[]>> {
+    const data = await this.usersService.findAll(params.offset, params.limit);
     return {
       data,
     };
@@ -82,7 +83,7 @@ export class UsersController {
     };
   }
 
-  @RoleD(Role.ADMIN)
+  @Is_PublicD()
   @Post('admin')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
