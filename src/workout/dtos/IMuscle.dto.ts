@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class IMusclesDto {
+export class IMuscleDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ description: 'Name of Muscles' })

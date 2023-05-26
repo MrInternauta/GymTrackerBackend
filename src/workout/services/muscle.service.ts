@@ -3,14 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
 
-import { IMusclesDto } from '../dtos/IMuscles.dto';
-import { IMuscles } from '../entities/IMuscles.entity';
+import { IMuscleDto } from '../dtos/IMuscle.dto';
+import { IMuscle } from '../entities/IMuscle.entity';
 
 @Injectable()
 export class MuscleService {
-  constructor(@InjectRepository(IMuscles) private muscleRepo: Repository<IMuscles>) {}
+  constructor(@InjectRepository(IMuscle) private muscleRepo: Repository<IMuscle>) {}
 
-  findAll(skip: number, take: number): Promise<Array<IMuscles>> {
+  findAll(skip: number, take: number): Promise<Array<IMuscle>> {
     if (skip >= 0 && take) {
       return this.muscleRepo.find({
         take,
@@ -20,17 +20,17 @@ export class MuscleService {
     return this.muscleRepo.find();
   }
 
-  findOne(id: number): Promise<IMuscles> {
+  findOne(id: number): Promise<IMuscle> {
     return this.muscleRepo.findOneBy({ id });
   }
 
-  findByName(name: string): Promise<IMuscles> {
+  findByName(name: string): Promise<IMuscle> {
     return this.muscleRepo.findOneBy({
       name,
     });
   }
 
-  async create(entity: IMusclesDto) {
+  async create(entity: IMuscleDto) {
     try {
       const muscle = await this.findByName(entity.name);
       if (muscle) throw new BadRequestException('The muscle name is already in use');
@@ -44,7 +44,7 @@ export class MuscleService {
     }
   }
 
-  async update(id: number, payload: IMusclesDto) {
+  async update(id: number, payload: IMuscleDto) {
     try {
       const muscle = await this.findOne(id);
       if (!muscle) {

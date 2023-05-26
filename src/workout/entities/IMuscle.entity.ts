@@ -6,7 +6,7 @@ import { IExercise } from './IExercise.entity';
 @Entity({
   name: 'muscles',
 })
-export class IMuscles extends BasicEntity {
+export class IMuscle extends BasicEntity {
   @PrimaryGeneratedColumn()
   public id: number;
 

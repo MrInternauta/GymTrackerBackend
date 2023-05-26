@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGe
 
 import { BasicEntity } from '../../core/interfaces/basic.entity';
 import { IEquipment } from './IEquipment.entity';
-import { IMuscles } from './IMuscles.entity';
+import { IMuscle } from './IMuscle.entity';
 
 @Entity({
   name: 'exercises',
@@ -23,7 +23,7 @@ export class IExercise extends BasicEntity {
   })
   public description: string;
 
-  @ManyToMany(() => IMuscles, musclesTarget => musclesTarget.exercises, {
+  @ManyToMany(() => IMuscle, musclesTarget => musclesTarget.exercises, {
     nullable: true,
   })
   @JoinTable({
@@ -35,7 +35,7 @@ export class IExercise extends BasicEntity {
       name: 'exercise_id',
     },
   })
-  public musclesTarget: Array<IMuscles>;
+  public musclesTarget: Array<IMuscle>;
 
   @ManyToOne(() => IEquipment, equipment => equipment.exercises, { nullable: true })
   @JoinColumn({

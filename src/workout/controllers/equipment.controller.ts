@@ -26,13 +26,13 @@ import { IEquipmentDto } from '../dtos/IEquipment.dto';
 import { IEquipment } from '../entities/IEquipment.entity';
 import { EquipmentService } from '../services/equipment.service';
 
-@Controller('Equipment')
-@ApiTags('Equipment')
+@Controller('equipment')
+@ApiTags('equipment')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class EquipmentController {
   constructor(private equipmentService: EquipmentService) {}
 
-  @RoleD(Role.ADMIN)
+  @RoleD(Role.ADMIN, Role.CUSTOMER)
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

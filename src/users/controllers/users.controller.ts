@@ -83,7 +83,7 @@ export class UsersController {
     };
   }
 
-  @Is_PublicD()
+  @RoleD(Role.ADMIN)
   @Post('admin')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
