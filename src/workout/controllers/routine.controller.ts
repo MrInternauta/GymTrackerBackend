@@ -22,6 +22,7 @@ import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../core/auth/guards/roles.guard';
 import { Role } from '../../core/auth/models/roles.model';
 import { FilterDto } from '../../core/interfaces/filter.dto';
+import { IRepetitionsRoutinesDto } from '../dtos/IRepetitionsRoutines.dto';
 import { IRoutineDto } from '../dtos/IRoutine.dto';
 import { IRoutine } from '../entities/IRoutine.entity';
 import { RoutineService } from '../services/routine.service';
@@ -37,7 +38,7 @@ export class RoutineController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Routine list',
-    description: `Get all Routine, method allowed for ${Role.ADMIN} rol`,
+    description: `Get all Routine, method allowed for ${Role.ADMIN}, and ${Role.CUSTOMER} roles`,
     parameters: [
       {
         name: 'page',
@@ -86,7 +87,7 @@ export class RoutineController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create an Routine',
-    description: `Create an Routine, method allowed for ${Role.ADMIN} rol`,
+    description: `Create an Routine, method allowed for ${Role.ADMIN}, and ${Role.CUSTOMER} roles`,
   })
   async createRoutine(@Body() payload: IRoutineDto): Promise<GenericResponse<IRoutine>> {
     return {
@@ -114,6 +115,35 @@ export class RoutineController {
     @Body() payload: IRoutineDto
   ): Promise<GenericResponse<IRoutine>> {
     const wasUpdated = await this.RoutineService.update(id, payload);
+    if (!wasUpdated) {
+      throw new BadRequestException('Routine not updated');
+    }
+    return {
+      message: 'Routine updated',
+      data: wasUpdated,
+    };
+  }
+
+  @Put('add/:RoutineId')
+  @HttpCode(HttpStatus.OK)
+  @RoleD(Role.ADMIN, Role.CUSTOMER)
+  @ApiOperation({
+    summary: 'Update an Routine and add reps',
+    description: `Update Routine, method allowed for ${Role.ADMIN}, and ${Role.CUSTOMER} roles`,
+    parameters: [
+      {
+        name: 'RoutineId',
+        description: 'Routine Id',
+        in: 'path',
+        required: true,
+      },
+    ],
+  })
+  async addReps(
+    @Param('RoutineId', ParseIntPipe) id: number,
+    @Body() payload: IRepetitionsRoutinesDto
+  ): Promise<GenericResponse<IRoutine>> {
+    const wasUpdated = await this.RoutineService.addReps(id, payload);
     if (!wasUpdated) {
       throw new BadRequestException('Routine not updated');
     }

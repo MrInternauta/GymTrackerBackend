@@ -37,7 +37,7 @@ export class ExerciseController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Exercise list',
-    description: `Get all Exercise, method allowed for ${Role.ADMIN} rol`,
+    description: `Get all Exercise, method allowed for ${Role.ADMIN}, and ${Role.CUSTOMER} roles`,
     parameters: [
       {
         name: 'page',
@@ -76,8 +76,9 @@ export class ExerciseController {
     ],
   })
   async get(@Param('ExerciseId', ParseIntPipe) id: number): Promise<GenericResponse<IExercise>> {
+    const getRelations = true;
     return {
-      data: await this.ExerciseService.findOne(id),
+      data: await this.ExerciseService.findOne(id, getRelations),
     };
   }
 
@@ -86,7 +87,7 @@ export class ExerciseController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create an Exercise',
-    description: `Create an Exercise, method allowed for ${Role.ADMIN} rol`,
+    description: `Create an Exercise, method allowed for ${Role.ADMIN}, and ${Role.CUSTOMER} roles`,
   })
   async createExercise(@Body() payload: IExerciseDto): Promise<GenericResponse<IExercise>> {
     return {

@@ -13,7 +13,7 @@ export class AuthService {
   constructor(private userService: UsersService, private jwtService: JwtService) {}
 
   async validateUser(userName: string, password: string) {
-    const user = await this.userService.findByEmailWithCustomer(userName);
+    const user = await this.userService.findByEmail(userName);
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       throw new ForbiddenException('The email address or password is wrong!');

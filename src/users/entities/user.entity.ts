@@ -22,7 +22,7 @@ export class User extends BasicEntity {
   role: string;
   //optional relation | Bidirectional relation (ref)
   //Join column (only one table, this table contains the foreign key)
-  @OneToOne(() => Customer, costumer => costumer.user, { nullable: true })
+  @OneToOne(() => Customer, costumer => costumer.user, { nullable: true, eager: true })
   @JoinColumn({
     name: 'customer_id',
   }) //naming relation 1 to 1

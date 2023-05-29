@@ -37,7 +37,7 @@ export class MuscleController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Muscle list',
-    description: `Get all Muscle, method allowed for ${Role.ADMIN} rol`,
+    description: `Get all Muscle, method allowed for ${Role.ADMIN}, and ${Role.CUSTOMER} roles`,
     parameters: [
       {
         name: 'page',
@@ -86,7 +86,7 @@ export class MuscleController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create an Muscle',
-    description: `Create an Muscle, method allowed for ${Role.ADMIN} rol`,
+    description: `Create an Muscle, method allowed for ${Role.ADMIN}, and ${Role.CUSTOMER} roles`,
   })
   async createMuscle(@Body() payload: IMuscleDto): Promise<GenericResponse<IMuscle>> {
     return {

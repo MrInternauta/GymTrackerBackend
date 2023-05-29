@@ -50,6 +50,12 @@ export class EquipmentService {
       if (!equipment) {
         throw new NotFoundException('The equipment was not found');
       }
+
+      if (payload?.name !== equipment?.name) {
+        const equipment2 = await this.findByName(payload.name);
+        if (equipment2) throw new BadRequestException('The equipment name is already in use');
+      }
+
       this.equipmentRepo.merge(equipment, payload);
       return await this.equipmentRepo.save(equipment);
     } catch (error) {

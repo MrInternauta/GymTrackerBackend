@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { IMuscleDto } from '../dtos/IMuscle.dto';
 import { IMuscle } from '../entities/IMuscle.entity';
@@ -30,6 +30,10 @@ export class MuscleService {
     });
   }
 
+  findByIds(id: Array<number>): Promise<Array<IMuscle>> {
+    return this.muscleRepo.findBy({ id: In(id) });
+  }
+
   async create(entity: IMuscleDto) {
     try {
       const muscle = await this.findByName(entity.name);
@@ -50,6 +54,12 @@ export class MuscleService {
       if (!muscle) {
         throw new NotFoundException('The muscle was not found');
       }
+
+      if (payload?.name !== muscle?.name) {
+        const muscle = await this.findByName(payload.name);
+        if (muscle) throw new BadRequestException('The muscle name is already in use');
+      }
+
       this.muscleRepo.merge(muscle, payload);
       return await this.muscleRepo.save(muscle);
     } catch (error) {

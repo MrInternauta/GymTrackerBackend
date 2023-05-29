@@ -109,13 +109,25 @@ docker build -t mrinternauta/node_app:dev  -f dockerfile.dev .
 
 docker run -d -p 3000:3000  mrinternauta/node_app:dev  
 
-
+#  TypeORM Commands
 ## Run migrations
 ```bash
 docker-compose up postgres_service -d
 npm i
 docker-compose up app  -d  
 gulp --command="migrations:show"
+gulp --command="migrations:run"
+
+
+```
+## Generate migrations
+```bash
+gulp --command="migrations:generate"
+
+```
+
+## Execute migrations
+```bash
 gulp --command="migrations:run"
 
 ```

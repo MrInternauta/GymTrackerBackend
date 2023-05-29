@@ -37,7 +37,7 @@ export class EquipmentController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Equipment list',
-    description: `Get all Equipment, method allowed for ${Role.ADMIN} rol`,
+    description: `Get all Equipment, method allowed for ${Role.ADMIN}, and ${Role.CUSTOMER} roles`,
     parameters: [
       {
         name: 'page',
@@ -86,7 +86,7 @@ export class EquipmentController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create an Equipment',
-    description: `Create an Equipment, method allowed for ${Role.ADMIN} rol`,
+    description: `Create an Equipment, method allowed for ${Role.ADMIN}, and ${Role.CUSTOMER} roles`,
   })
   async createEquipment(@Body() payload: IEquipmentDto): Promise<GenericResponse<IEquipment>> {
     return {

@@ -1,6 +1,6 @@
 export interface GenericResponse<T> {
   statusCode?: number;
-  message?: string;
+  message?: string | Array<string>;
   error?: string;
   data?: T;
 }

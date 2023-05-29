@@ -1,8 +1,8 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { BasicEntity } from '../../core/interfaces/basic.entity';
 import { User } from '../../users/entities/user.entity';
-import { IRepetitionsRoutines } from './IRepetitionsRoutines.entity';
+import { IRepetitionsRoutines } from '../models/IRepetitionsRoutines';
 
 @Entity({
   name: 'routines',
@@ -23,9 +23,8 @@ export class IRoutine extends BasicEntity {
   })
   public description: string;
 
-  @OneToMany(() => IRepetitionsRoutines, workout => workout.routine, {
-    nullable: true,
-  })
+  @Column({ type: 'jsonb', nullable: true })
+  @Reflect.metadata('design:type', Object)
   public repetitions: Array<IRepetitionsRoutines>;
 
   @ManyToMany(() => User, user => user.routines, {

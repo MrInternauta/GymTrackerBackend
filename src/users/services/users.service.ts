@@ -29,7 +29,6 @@ export class UsersService {
   findbyCustomerId(id: number) {
     return this.userRepo.find({
       where: { customer: { id } },
-      relations: ['customer'],
     });
   }
 
@@ -40,20 +39,12 @@ export class UsersService {
   async findOneWithCustomer(id: number) {
     return this.userRepo.findOne({
       where: { id },
-      relations: ['customer'],
     });
   }
 
   async findByEmail(email: string): Promise<User> {
     return this.userRepo.findOneBy({
       email,
-    });
-  }
-
-  async findByEmailWithCustomer(email: string): Promise<User> {
-    return this.userRepo.findOne({
-      where: { email },
-      relations: ['customer'],
     });
   }
 
