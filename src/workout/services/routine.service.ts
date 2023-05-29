@@ -6,6 +6,8 @@ import { Repository } from 'typeorm';
 import { IRepetitionsRoutinesDto } from '../dtos/IRepetitionsRoutines.dto';
 import { IRoutineDto } from '../dtos/IRoutine.dto';
 import { IRoutine } from '../entities/IRoutine.entity';
+import { IRepetitions } from '../models/IRepetitions';
+import { IRepetitionsRoutines } from '../models/IRepetitionsRoutines';
 import { ExerciseService } from './exercise.service';
 
 @Injectable()
@@ -84,27 +86,41 @@ export class RoutineService {
       if (!exercise) {
         throw new NotFoundException(`The exercise '${payload?.exerciseId}' was not found`);
       }
-      payload.repetitionsWeight = payload?.repetitionsWeight?.filter(item => item);
+      payload.repetitionsWeight = payload?.repetitionsWeight?.filter(item => item?.length);
       //Get repetitions
       if (!payload?.repetitionsWeight?.length) {
         throw new BadRequestException(`The repetitions of '${exercise?.name}' are required`);
       }
-      // const repetitionRoutine = await this.repetitionsRoutineRepo.create({
-      //   exercise,
-      //   repetitions: repetitions,
-      //   routine: Routine,
-      // });
-      // console.log(repetitionRoutine);
-      // await this.repetitionsRoutineRepo.save(repetitionRoutine);
 
       const newRoutine = {
         ...Routine,
       };
-      payload?.repetitionsWeight;
 
-      newRoutine.repetitions.push();
+      const repetitions: Array<IRepetitions> = payload?.repetitionsWeight.map(rep => ({
+        reps: rep[0],
+        weight: rep[1],
+      }));
 
-      return await this.RoutineRepo.merge(Routine, newRoutine);
+      if (!newRoutine?.repetitions) {
+        newRoutine.repetitions = [];
+      }
+
+      const existSerie = newRoutine.repetitions.find(
+        item => item?.exercise === payload?.exerciseId && item?.serieExercise === payload?.serieExercise
+      );
+      if (!existSerie) {
+        const respRoutine: IRepetitionsRoutines = {
+          exercise: payload?.exerciseId,
+          serieExercise: payload?.serieExercise ?? 1,
+          repetitions,
+        };
+        newRoutine.repetitions.push(respRoutine);
+      } else {
+        existSerie.repetitions = repetitions;
+      }
+
+      await this.RoutineRepo.merge(Routine, newRoutine);
+      return await this.RoutineRepo.save(Routine);
     } catch (error) {
       console.log(error);
 
@@ -114,6 +130,7 @@ export class RoutineService {
       throw new BadRequestException(error);
     }
   }
+
   async delete(id: number) {
     try {
       const Routine = await this.findOne(id);

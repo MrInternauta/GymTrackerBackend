@@ -1,6 +1,7 @@
 import { IRepetitions } from './IRepetitions';
 
 export class IRepetitionsRoutines {
-  exercise: string;
+  exercise: number;
+  serieExercise: number;
   repetitions: Array<IRepetitions>;
 }

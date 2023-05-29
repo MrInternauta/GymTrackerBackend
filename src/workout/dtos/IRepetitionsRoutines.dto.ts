@@ -8,6 +8,11 @@ export class IRepetitionsRoutinesDto {
   @ApiProperty({ description: 'exercise used for the routine' })
   public exerciseId: number;
 
+  @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty({ description: 'serie of exercise used for the routine' })
+  public serieExercise: number;
+
   @IsArray()
   @IsNotEmpty()
   @ApiProperty({ description: 'repetitions used for the exercise' })
