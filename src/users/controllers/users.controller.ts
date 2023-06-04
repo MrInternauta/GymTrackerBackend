@@ -83,7 +83,7 @@ export class UsersController {
     };
   }
 
-  @RoleD(Role.ADMIN)
+  @RoleD(Role.ADMIN, Role.CUSTOMER)
   @Post('admin')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
@@ -109,7 +109,7 @@ export class UsersController {
     };
   }
 
-  @Put(':userId')
+  @Put('admin/:userId')
   @HttpCode(HttpStatus.OK)
   @RoleD(Role.ADMIN, Role.CUSTOMER)
   @ApiOperation({
@@ -139,7 +139,7 @@ export class UsersController {
   }
 
   @RoleD(Role.ADMIN, Role.CUSTOMER)
-  @Put('customer/:userId')
+  @Put(':userId')
   @ApiOperation({
     summary: 'Update a customer',
     description: `Update user, method allowed for ${Role.ADMIN}, and ${Role.CUSTOMER} roles`,
